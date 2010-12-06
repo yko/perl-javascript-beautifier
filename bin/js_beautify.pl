@@ -20,6 +20,7 @@ GetOptions(
 	"s|indent_size=i",
 	"c|indent_character=s",
 	"p|preserve_newlines",
+	"a|autodetect_intdent",
 ) or pod2usage(2);
 
 pod2usage(1) if $params{help};
@@ -39,7 +40,8 @@ $file_io->close;
 my $pretty_js = js_beautify( $js_source_code, {
     indent_size => $params{s} || 4,
     indent_character => $params{c} || ' ',
-    preserve_newlines => $params{p} || 1
+    preserve_newlines => $params{p} || 1,
+    autodetect_intdent => $params{a} || 1,
 } );
 
 if ( $params{output} or $params{o} ) {
@@ -86,6 +88,10 @@ By default, we use 4 spaces.
 but if you prefer 8 spaces, we can do B<-s=8>
 
 =item B<-p>, B<--preserve_newlines>
+
+1 by default
+
+=item B<-a>, B<--autodetect_intdent>
 
 1 by default
 

@@ -241,6 +241,15 @@ bt( "var\na=dont_preserve_newlines", "var a = dont_preserve_newlines" );
 $opts->{preserve_newlines} = 1;
 bt( "var\na=do_preserve_newlines", "var\na = do_preserve_newlines"  );
 
+$opts->{preserve_newlines} = 0;
+$opts->{autodetect_intdent} = 1;
+$opts->{indent_char} = " ";
+
+bt( "  var a=preserve_first_indent;\nvar b = also_indented", "  var a = preserve_first_indent;\n  var b = also_indented"  );
+
+$opts->{indent_size} = 2;
+bt( "           var a=preserve_first_indent;\nvar b = also_indented", "            var a = preserve_first_indent;\n            var b = also_indented"  );
+
 done_testing( $tests_num );
 
 1;

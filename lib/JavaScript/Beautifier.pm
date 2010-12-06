@@ -26,25 +26,44 @@ my ( $opt_indent_level, $opt_indent_size, $opt_indent_character, $opt_preserve_n
 sub js_beautify {
     my ( $js_source_code, $opts ) = @_;
     
+    @output = ();
+
     $opt_indent_size = $opts->{indent_size} || 4;
     $opt_indent_character = $opts->{indent_character} || ' ';
     $opt_preserve_newlines = exists $opts->{preserve_newlines} ? $opts->{preserve_newlines} : 1;
     $opt_indent_level = $opts->{indent_level} ||= 0;
     $opt_space_after_anon_function = exists $opts->{space_after_anon_function} ? $opts->{space_after_anon_function} : 0;
 
-    # -------------------------------------
     $just_added_newline = 0;
-    $indent_string = '';
-    while ( $opt_indent_size-- ) {
-        $indent_string .= $opt_indent_character;
+    $indent_string = $opt_indent_character x $opt_indent_size;
+
+    if ($opts->{autodetect_intdent} && !$opt_indent_level) {
+        if ($js_source_code =~ /^(?:\Q$indent_string\E)+/) {
+
+            # Initial indent
+            my $start = $&;
+
+            # Count level
+            $opt_indent_level += $start =~ s/(?:\Q$indent_string\E)/$&/g;
+
+            # If there's more indent chars
+            # we interpret them as one more level
+            if ($js_source_code =~ /^\Q$start$opt_indent_character\E/) {
+                $opt_indent_level++;
+            }
+            for ( 1 .. $opt_indent_level ) {
+                push @output, $indent_string;
+            }
+        }
     }
+
+    # -------------------------------------
     @input = split('', $js_source_code);
     
     $last_word = ''; # last 'TK_WORD' passed
     $last_type = 'TK_START_EXPR'; # last token type
     $last_text = ''; # last token text
     $last_last_text = ''; # pre-last token text
-    @output = ();
 
     $do_block_just_closed = 0;
     $var_line = 0;
